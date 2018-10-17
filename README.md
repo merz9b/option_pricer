@@ -1,1 +1,1 @@
-# Guosen option_pricer
+# Guosen option pricer
