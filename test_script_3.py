@@ -37,6 +37,7 @@ time_from_reference = time_from_reference_factory(day_counter, start_date)
 
 
 # MC params
+num_trials = 20
 num_paths = 100000
 time_steps = day_counter.dayCount(start_date, end_date)
 
@@ -99,11 +100,13 @@ seq = ql.GaussianPathGenerator(
     rsg_gaussian,
     False)
 
-sim_prices = np.zeros((num_paths, time_steps + 1))
-
-for idx in range(num_paths):
-    tmp_path = seq.next().value()
-    sim_prices[idx, :] = np.fromiter(tmp_path, dtype=np.float)
+trials_collections = []
+for _ in range(num_trials):
+    sim_prices = np.zeros((num_paths, time_steps + 1))
+    for idx in range(num_paths):
+        tmp_path = seq.next().value()
+        sim_prices[idx, :] = np.fromiter(tmp_path, dtype=np.float)
+    trials_collections.append(sim_prices)
 
 
 def payoff_mapping(x):
@@ -135,6 +138,13 @@ def temp_pay_off(single_path):
     return total_pay_off
 
 
-option_price_sim = np.apply_along_axis(temp_pay_off, 1, sim_prices)
-o_p = option_price_sim.mean()
-print('Price : ', o_p)
+option_price_collections = []
+for i in range(num_trials):
+    option_price_sim = np.apply_along_axis(
+        temp_pay_off, 1, trials_collections[i])
+    o_p = option_price_sim.mean()
+    option_price_collections.append(o_p)
+
+
+print('Price : ', np.mean(option_price_collections))
+print('Std : ', np.std(option_price_collections))
