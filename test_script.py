@@ -312,3 +312,22 @@ next(res)
 res.send(4)
 res.send(5)
 res.send(6)
+
+
+class AbstractType:
+    pass
+
+class OptionType(AbstractType):
+    call = 0
+    put = 1
+
+class ExerciseType(AbstractType):
+    American = 0
+    European = 2
+
+print(OptionType.call|ExerciseType.American)
+print(OptionType.put|ExerciseType.American)
+print(OptionType.call|ExerciseType.European)
+print(OptionType.put|ExerciseType.European)
+
+
