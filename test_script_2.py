@@ -7,34 +7,6 @@ import QuantLib as ql
 import numpy as np
 import pandas as pd
 
-'''
-Exotic put option
-
-strike : max(avg_price, 13000) + 1000; monthly rolling avg price : avg_price,
-
-payoff :
-    if x <= 0:
-        return 0
-    elif x <= 500:
-        return x
-    elif x <= 1000:
-        return 500 + (x - 500) * 0.9
-    elif x <= 1500:
-        return 950 + (x - 1000) * 0.8
-    elif x <= 2000:
-        return 1350 + (x - 1500) * 0.6
-    else:
-        return 1650 + (x - 2000) * 0.4
-
-    vannilla payoff : x = underlying_price - strike
-
-underlying_price_0 : 13000
-t : 7 months
-volatility : 0.25
-interest_rate : 0
-dividend_rate : 0
-'''
-
 
 def time_from_reference_factory(daycounter, ref):
     """
