@@ -95,10 +95,13 @@ def fetch_one_symbol(product_id, cycle):
         headers=header)
 
     tdf = parse_content(resp.json())
+    tdf = tdf.assign(terms=cycle)
 
     print('=' * 80)
     print(tdf)
     print('=' * 80)
+
+    return resp.json()
 
 
 if __name__ == '__main__':
