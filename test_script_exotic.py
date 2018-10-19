@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2018/10/18 15:52
 # @Author  : Xin Zhang
-# @File    : test_script_3.py
+# @File    : test_script_exotic.py
 
 import QuantLib as ql
 import numpy as np
@@ -124,6 +124,11 @@ def payoff_mapping(x):
         return 1650 + (x - 2000) * 0.4
 
 
+def payoff_dev(underlying_price, strike):
+    pay = underlying_price - strike
+    return payoff_mapping(pay)
+
+
 def temp_pay_off(single_path):
     global month_end_index
     total_pay_off = 0
@@ -132,8 +137,7 @@ def temp_pay_off(single_path):
         m = price_list.mean()
         last_price = price_list[-1]
         strike = max(m, 13000) + 1000
-        p_off = strike - last_price
-        a_p_off = payoff_mapping(p_off)
+        a_p_off = payoff_dev(last_price, strike)
         total_pay_off += a_p_off
     return total_pay_off
 
