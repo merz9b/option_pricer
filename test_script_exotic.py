@@ -10,7 +10,7 @@ import numpy as np
 '''
 Exotic put option
 
-strike : max(avg_price, 13000) + 1000; monthly rolling avg price : avg_price,
+strike : max(avg_price, 13000) + 1000; monthly month end rolling avg price : avg_price,
 
 payoff :
     if x <= 0:
