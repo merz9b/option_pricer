@@ -48,6 +48,7 @@ process = Ql.BlackScholesMertonProcess(
 )
 
 ame_option.setPricingEngine(Ql.FDAmericanEngine(process))
+print('FDAmericanEngine price:', ame_option.NPV())
 
 # finite difference method
 ame_option.setPricingEngine(Ql.FDDividendAmericanEngine(process))
