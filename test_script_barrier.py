@@ -5,7 +5,7 @@
 
 import QuantLib as Ql
 from QuantLib import Date, BarrierOption, Barrier, SimpleQuote, QuoteHandle
-from option_pricer.utils.tools import get_greeks
+from option_tools.utils.tools import GreeksComputer
 
 start_date = Date(8, 10, 2017)
 end_date = Date(8, 1, 2018)
@@ -54,9 +54,10 @@ barrier_option.setPricingEngine(Ql.AnalyticBarrierEngine(process))
 # price
 print(barrier_option.NPV())
 
-get_greeks(
-    barrier_option,
-    underlying_price,
-    interest_rate,
-    volatility,
-    start_date)
+# implement numerical method
+gc = GreeksComputer(barrier_option)
+
+gc.get_greeks(underlying_price,
+              interest_rate,
+              volatility,
+              start_date)

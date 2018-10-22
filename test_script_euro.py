@@ -5,7 +5,7 @@
 
 import QuantLib as Ql
 from QuantLib import Date, EuropeanOption, SimpleQuote, QuoteHandle
-from option_pricer.utils.tools import get_greeks
+from option_tools.utils.tools import GreeksComputer
 
 start_date = Date(7, 3, 2018)
 end_date = Date(7, 7, 2018)
@@ -50,10 +50,13 @@ euro_option.setPricingEngine(Ql.AnalyticEuropeanEngine(process))
 print(euro_option.NPV())
 
 # theoretical method
-get_greeks(euro_option)
+gc = GreeksComputer(euro_option)
+gc.get_greeks()
 
 # implement numerical method
-get_greeks(euro_option, underlying_price,
-           interest_rate,
-           volatility,
-           start_date, auto=False)
+gc = GreeksComputer(euro_option, numerical=True)
+
+gc.get_greeks(underlying_price,
+              interest_rate,
+              volatility,
+              start_date)

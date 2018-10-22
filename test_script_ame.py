@@ -5,7 +5,7 @@
 
 import QuantLib as Ql
 from QuantLib import Date, VanillaOption, SimpleQuote, QuoteHandle
-from option_pricer.utils.tools import get_greeks
+from option_tools.utils.tools import GreeksComputer
 
 start_date = Date(8, 5, 2015)
 end_date = Date(15, 1, 2016)
@@ -48,19 +48,35 @@ process = Ql.BlackScholesMertonProcess(
 )
 
 ame_option.setPricingEngine(Ql.FDAmericanEngine(process))
-#
-ame_option.setPricingEngine(Ql.FDDividendAmericanEngine(process))
-print(ame_option.NPV())
 
+# finite difference method
+ame_option.setPricingEngine(Ql.FDDividendAmericanEngine(process))
+print('FDDividendAmericanEngine price:', ame_option.NPV())
+
+# BAW
+ame_option.setPricingEngine(Ql.BaroneAdesiWhaleyEngine(process))
+print('BaroneAdesiWhaleyEngine price', ame_option.NPV())
+
+#
 steps = 200
 ame_option.setPricingEngine(Ql.BinomialVanillaEngine(process, 'crr', steps))
-print(ame_option.NPV())
+print('BinomialVanillaEngine price', ame_option.NPV())
+
+# actual price : 7
+# implied volatility:
+impl_vol = ame_option.impliedVolatility(7, process)
+print(impl_vol)
 
 # theoretical method
-get_greeks(ame_option)
+gc = GreeksComputer(ame_option)
+gc.get_greeks()
 
 # implement numerical method
-get_greeks(ame_option, underlying_price,
+gc = GreeksComputer(ame_option)
+
+gc.get_greeks(underlying_price,
            interest_rate,
            volatility,
-           start_date, auto=False)
+           start_date)
+
+# implied volatility
