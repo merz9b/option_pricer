@@ -3,18 +3,33 @@
 # @Author  : Xin Zhang
 # @File    : option_types.py
 
-
-class OptionType:
-    CALL = 0
-    PUT = 1
+from QuantLib import Option as OpType
 
 
-class ExerciseType:
-    EUROPEAN = 0
-    AMERICAN = 2
+# OptionType:
+CALL = OpType.Call
+PUT = OpType.Put
+
+'000000 0000'
+
+class OptionSet:
+    @classmethod
+    def VANNILLA(cls):
+        return cls
 
 
-class AsianAverageType:
+# OptionGeneric:
+VANNILLA = 0
+EXOTIC = 1
+
+'http://repo.optionplus.cn/gs_zhangxin/test_1.git'
+
+# ExerciseType:
+EUROPEAN = 0
+AMERICAN = 2
+
+
+class AverageType:
     GEOMETRIC = 8
     ARITHMETIC = 4
 
@@ -25,23 +40,18 @@ class AveragingContinuity:
 
 
 if __name__ == '__main__':
-    s = [OptionType.CALL | ExerciseType.EUROPEAN,
-         OptionType.CALL | ExerciseType.AMERICAN,
-         OptionType.PUT | ExerciseType.EUROPEAN,
-         OptionType.PUT | ExerciseType.AMERICAN,
+    s = [VANNILLA | EUROPEAN,
+         VANNILLA | AMERICAN,
 
-         OptionType.CALL | ExerciseType.EUROPEAN | AsianAverageType.ARITHMETIC,
-         OptionType.PUT | ExerciseType.EUROPEAN | AsianAverageType.ARITHMETIC,
+         EXOTIC | EUROPEAN | AverageType.ARITHMETIC,
 
-         OptionType.CALL | ExerciseType.EUROPEAN | AsianAverageType.GEOMETRIC,
-         OptionType.PUT | ExerciseType.EUROPEAN | AsianAverageType.GEOMETRIC,
+         EXOTIC | EUROPEAN | AverageType.GEOMETRIC,
 
-         OptionType.CALL | ExerciseType.EUROPEAN |
-         AsianAverageType.ARITHMETIC | AveragingContinuity.CONTINUOUS,
-         OptionType.PUT | ExerciseType.EUROPEAN |
-         AsianAverageType.ARITHMETIC | AveragingContinuity.CONTINUOUS,
+         EXOTIC | EUROPEAN |
+         AverageType.ARITHMETIC | AveragingContinuity.CONTINUOUS,
 
-         OptionType.CALL | ExerciseType.EUROPEAN |
-         AsianAverageType.GEOMETRIC | AveragingContinuity.CONTINUOUS,
-         OptionType.PUT | ExerciseType.EUROPEAN |
-         AsianAverageType.GEOMETRIC | AveragingContinuity.CONTINUOUS]
+         EXOTIC | EUROPEAN |
+         AverageType.GEOMETRIC | AveragingContinuity.CONTINUOUS
+         ]
+
+    print(sorted(s))

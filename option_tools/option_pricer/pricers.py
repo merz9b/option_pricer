@@ -3,6 +3,7 @@
 # @Author  : Xin Zhang
 # @File    : pricers.py
 
+from .options.option_types import OptionType, ExerciseType
 
 PRICER_COLLECTIONS = {}
 
@@ -16,5 +17,5 @@ def register_pricer(pricer_id):
 
 
 @register_pricer(12)
-def asian_pricer(op):
+def european_(op):
     return op

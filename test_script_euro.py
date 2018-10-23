@@ -3,6 +3,18 @@
 # @Author  : Xin Zhang
 # @File    : test_script_euro.py
 
+"""
+European call option
+evaluation date : 2018-03-07
+maturity date : 2018-07-07
+spot price : 100
+strike price : 100
+volatility : 0.2
+risk_free_rate : 0.01
+dividend rate : 0
+
+price : 4.77139
+"""
 import QuantLib as Ql
 from QuantLib import Date, EuropeanOption, SimpleQuote, QuoteHandle
 from option_tools.utils.tools import GreeksComputer
@@ -47,7 +59,7 @@ process = Ql.BlackScholesMertonProcess(
 
 euro_option.setPricingEngine(Ql.AnalyticEuropeanEngine(process))
 
-print(euro_option.NPV())
+print(euro_option.NPV()) # 4.77139
 
 # theoretical method
 gc = GreeksComputer(euro_option)

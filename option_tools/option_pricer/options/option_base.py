@@ -4,8 +4,72 @@
 # @File    : option_base.py
 
 from option_tools.utils.tools import cast_string_to_date
-from QuantLib import SimpleQuote
+from QuantLib import SimpleQuote, China, ActualActual
 from .option_types import ExerciseType, OptionType
+
+
+class Greeks:
+    def __init__(self):
+        self._delta = None
+        self._gamma = None
+        self._rho = None
+        self._theta = None
+        self._vega = None
+
+    @property
+    def delta(self):
+        return self._delta
+
+    @property
+    def gamma(self):
+        return self._gamma
+
+    @property
+    def rho(self):
+        return self._rho
+
+    @property
+    def theta(self):
+        return self._theta
+
+    @property
+    def vega(self):
+        return self._vega
+
+    @delta.setter
+    def delta(self, delta):
+        self._delta = delta
+
+    @gamma.setter
+    def gamma(self, gamma):
+        self._gamma = gamma
+
+    @rho.setter
+    def rho(self, rho):
+        self._rho = rho
+
+    @theta.setter
+    def theta(self, theta):
+        self._theta = theta
+
+    @vega.setter
+    def vega(self, vega):
+        self._vega = vega
+
+    def to_dict(self):
+
+        return {
+            'delta': self.delta,
+            'gamma': self.gamma,
+            'rho': self.rho,
+            'theta': self.theta,
+            'vega': self.vega
+        }
+
+    def __str__(self):
+        return str(self.to_dict())
+
+    __repr__ = __str__
 
 
 class OptionBase:
@@ -19,6 +83,16 @@ class OptionBase:
         self.risk_free_rate = None
         self.dividend_rate = None
         self.npv = None
+        self.greeks = Greeks()
+
+        self.calendar = China()
+        self.day_counter = ActualActual()
+
+        self.__setup_finished = dict(
+            params=False,
+            exercise=False,
+            otype=False
+        )
 
     def set_params(
             self,
@@ -46,6 +120,7 @@ class OptionBase:
         self.evaluation_date = cast_string_to_date(evaluation_date)
         self.maturity_date = cast_string_to_date(maturity_date)
         self.dividend_rate = SimpleQuote(dividend_rate)
+        self.__setup_finished['params'] = True
 
     def set_exercise(self, exercise_type):
         """
@@ -53,6 +128,7 @@ class OptionBase:
         :param exercise_type: ExerciseType
         """
         self.oid |= exercise_type
+        self.__setup_finished['exercise'] = True
 
     def set_type(self, option_type):
         """
@@ -60,13 +136,13 @@ class OptionBase:
         :param option_type: OptionType
         """
         self.oid |= option_type
+        self.__setup_finished['otype'] = True
 
-    def set_engine(self, engine_type):
-        """
-        set price engine type
-        :param engine_type: EngineType
-        """
-        self.oid |= engine_type
+    def is_setup_finished(self):
+        base = True
+        for v in self.__setup_finished.values():
+            base = base and v
+        return base
 
 
 class VannillaOption(OptionBase):
