@@ -88,3 +88,18 @@ class AmericanOption(VannillaOption):
 class AsianOption(OptionBase):
     def __init__(self):
         super().__init__()
+        self.avg_start = None
+        self.avg_end = None
+        self.set_exercise(ExerciseType.EUROPEAN)
+
+    def set_average_params(self, avg_start, avg_end, avg_type, avg_continuity):
+        """
+        set asian option average params
+        :param avg_start: average start date
+        :param avg_end:  average end date
+        :param avg_type: AsianAverageType:[Geometric, Arithmetic]
+        :param avg_continuity: AveragingContinuity:[Continuous, Discrete]
+        """
+        self.avg_start = avg_start
+        self.avg_end = avg_end
+        self.oid = self.oid | avg_type | avg_continuity

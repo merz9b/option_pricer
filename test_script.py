@@ -243,6 +243,20 @@ def add_method(cls_ins):
     method_dict[cls_ins.id] = cls_ins()
     return cls_ins
 
+m = {}
+def d1(a):
+    def wrapper(b):
+        global m
+        m[a] = b
+        return b
+    return wrapper
+
+@d1(a = 1)
+def s1():
+    print(1)
+
+m[1]()
+
 
 class AbstractPricing(metaclass=abc.ABCMeta):
     id = None
