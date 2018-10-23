@@ -3,12 +3,8 @@
 # @Author  : Xin Zhang
 # @File    : test_script_4.py
 
-from option_tools.option_pricer.options.engine_types import (EngineType,
-                                                             OptionType,
-                                                             ExerciseType,
-                                                             AveragingContinuity,
-                                                             AsianAverageType
-                                                             )
+from option_tools.option_pricer.options.engine_types import (
+    EngineType, OptionType, ExerciseType, AveragingContinuity, AsianAverageType)
 
 
 mc = (
@@ -39,4 +35,3 @@ for a in ana:
 
 for a in ana:
     print(a | EngineType.MC)
-

@@ -61,6 +61,13 @@ class OptionBase:
         """
         self.oid |= option_type
 
+    def set_engine(self, engine_type):
+        """
+        set price engine type
+        :param engine_type: EngineType
+        """
+        self.oid |= engine_type
+
 
 class VannillaOption(OptionBase):
     pass

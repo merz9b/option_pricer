@@ -26,6 +26,8 @@ ANALYTIC_INCLUDE = (
 
 
 class Int:
+    __slots__ = ['attr', 'value']
+
     def __init__(self, value, attr):
         self.attr = attr
         self.value = value
@@ -45,6 +47,11 @@ class Int:
             raise TypeError('Invalid engine type.')
 
     __ror__ = __or__
+
+    def __str__(self):
+        return '<{tp}> : {d}'.format(tp=self.attr.upper(), d=self.value)
+
+    __repr__ = __str__
 
 
 class EngineType:
