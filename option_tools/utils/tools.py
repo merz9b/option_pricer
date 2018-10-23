@@ -3,7 +3,13 @@
 # @Author  : Xin Zhang
 # @File    : tools.py
 
+from datetime import datetime
 import QuantLib as Ql
+
+
+def cast_string_to_date(time_str, fmt='%Y-%m-%d'):
+    d = datetime.strptime(time_str, fmt)
+    return Ql.Date(d.day, d.month, d.year)
 
 
 class GreeksComputer:
