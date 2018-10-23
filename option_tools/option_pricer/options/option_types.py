@@ -3,55 +3,68 @@
 # @Author  : Xin Zhang
 # @File    : option_types.py
 
+
+"""
+
+option type coding
+
+0000 | 00000 |  0
+
+> 0 ~ 1
+
+Vannilla or Exotic
+
+
+> 2 ~ 32 dual number
+
+2 : Asian
+4 : Barrier
+6 : ....
+
+
+
+
+"""
+
 from QuantLib import Option as OpType
+
+
+class OptionMetaType(type):
+    def __new__(cls, name, bases, attrs):
+        if len(bases) > 0:
+            attrs['oid'] += bases[0].oid
+        return super().__new__(cls, name, bases, attrs)
 
 
 # OptionType:
 CALL = OpType.Call
 PUT = OpType.Put
 
-'000000 0000'
-
-class OptionSet:
-    @classmethod
-    def VANNILLA(cls):
-        return cls
 
 
-# OptionGeneric:
-VANNILLA = 0
-EXOTIC = 1
+class CodeGen:
+    # 1
+    VANNILLA = 0
+    EXOTIC = 1
 
-'http://repo.optionplus.cn/gs_zhangxin/test_1.git'
+    # 2
+    EUROPEAN = 10
+    AMERICAN = 20
 
-# ExerciseType:
-EUROPEAN = 0
-AMERICAN = 2
+    # 3
+    ASIAN = 100
+    BARRIER = 200
+
+    # 4
+    GEOMETRIC = 1000
+    ARITHMETIC = 2000
+
+    # 5
+    DISCRETE = 10000
+    CONTINUOUS = 20000
 
 
-class AverageType:
-    GEOMETRIC = 8
-    ARITHMETIC = 4
-
-
-class AveragingContinuity:
-    DISCRETE = 0
-    CONTINUOUS = 16
 
 
 if __name__ == '__main__':
-    s = [VANNILLA | EUROPEAN,
-         VANNILLA | AMERICAN,
-
-         EXOTIC | EUROPEAN | AverageType.ARITHMETIC,
-
-         EXOTIC | EUROPEAN | AverageType.GEOMETRIC,
-
-         EXOTIC | EUROPEAN |
-         AverageType.ARITHMETIC | AveragingContinuity.CONTINUOUS,
-
-         EXOTIC | EUROPEAN |
-         AverageType.GEOMETRIC | AveragingContinuity.CONTINUOUS
-         ]
-
-    print(sorted(s))
+    pass

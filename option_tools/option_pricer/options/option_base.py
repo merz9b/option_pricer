@@ -5,7 +5,7 @@
 
 from option_tools.utils.tools import cast_string_to_date
 from QuantLib import SimpleQuote, China, ActualActual
-from .option_types import ExerciseType, OptionType
+from .option_types import CodeGen, OptionMetaType
 
 
 class Greeks:
@@ -72,9 +72,9 @@ class Greeks:
     __repr__ = __str__
 
 
-class OptionBase:
+class OptionBase(metaclass= OptionMetaType):
+    oid = 0  # option id
     def __init__(self):
-        self.oid = 0  # option id
         self.evaluation_date = None
         self.maturity_date = None
         self.spot_price = None
@@ -146,27 +146,28 @@ class OptionBase:
 
 
 class VannillaOption(OptionBase):
-    pass
+    oid = CodeGen.VANNILLA
 
 
 class EuropeanOption(VannillaOption):
-    def __init__(self):
-        super().__init__()
-        self.set_exercise(ExerciseType.EUROPEAN)
+    oid = CodeGen.EUROPEAN
 
 
 class AmericanOption(VannillaOption):
-    def __init__(self):
-        super().__init__()
-        self.set_exercise(ExerciseType.AMERICAN)
+    oid = CodeGen.AMERICAN
 
 
-class AsianOption(OptionBase):
+class ExoticOption(OptionBase):
+    oid = CodeGen.EXOTIC
+
+
+class AsianOptionBase(ExoticOption):
+    oid = CodeGen.ASIAN
+
     def __init__(self):
         super().__init__()
         self.avg_start = None
         self.avg_end = None
-        self.set_exercise(ExerciseType.EUROPEAN)
 
     def set_average_params(self, avg_start, avg_end, avg_type, avg_continuity):
         """
@@ -178,4 +179,20 @@ class AsianOption(OptionBase):
         """
         self.avg_start = avg_start
         self.avg_end = avg_end
-        self.oid = self.oid | avg_type | avg_continuity
+
+
+
+
+class BarrierOptionBase(ExoticOption):
+    oid = CodeGen.BARRIER
+
+
+
+
+class AsianOption(AsianOptionBase):
+    oid = CodeGen.EUROPEAN
+
+
+class AmericanAsianOption(AsianOptionBase):
+    oid = CodeGen.AMERICAN
+

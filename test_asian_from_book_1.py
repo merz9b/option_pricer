@@ -121,6 +121,6 @@ fdm_price = option.NPV()
 fdm_delta = option.delta()
 fdm_gamma = option.gamma()
 
-print("BSM ASIAN FDM price is {0:.4f}".format(fdm_price))  # 2.1594
+print("BSM ASIAN FDM price is {0:.4f}".format(fdm_price))  # 1.944
 print("BSM ASIAN FDM delta is {0:.4f}".format(fdm_delta))
 print("BSM ASIAN FDM gamma is {0:.4f}".format(fdm_gamma))
