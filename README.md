@@ -44,9 +44,9 @@ Engines and options dependency relations are store in file `engine_include_confi
 ```python
 import QuantLib as Ql
 
-from option_tools.option_pricer.options.option_types import EuropeanOption
+from option_tools.option_pricer.options import EuropeanOption
 
-from option_tools.option_pricer.options.engine_types import AnalyticBsmEuropeanEngine
+from option_tools.option_pricer.engines import AnalyticBsmEuropeanEngine
 
 spot_price = 100
 strike_price = 100
@@ -94,9 +94,9 @@ print(option.greeks)
 ```python
 import QuantLib as Ql
 
-from option_tools.option_pricer.options.option_types import AmericanOption
+from option_tools.option_pricer.options import AmericanOption
 
-from option_tools.option_pricer.options.engine_types import FdBsmAmericanEngine
+from option_tools.option_pricer.engines import FdBsmAmericanEngine
 
 spot_price = 100
 strike_price = 100
@@ -150,9 +150,9 @@ print(ame_option.greeks)
 ```python
 import QuantLib as Ql
 
-from option_tools.option_pricer.options.option_types import ArithmeticDiscreteAsianOption
+from option_tools.option_pricer.options import ArithmeticDiscreteAsianOption
 
-from option_tools.option_pricer.options.engine_types import McBsmDiscreteArithmeticAsianEngine, FdBsmDiscreteArithmeticAsianEngine
+from option_tools.option_pricer.engines import McBsmDiscreteArithmeticAsianEngine, FdBsmDiscreteArithmeticAsianEngine
 
 spot_price = 100
 strike_price = 100
