@@ -3,8 +3,15 @@
 # @Author  : Xin Zhang
 # @File    : pricers.py
 
-from .options.engine_types import EngineType
-from .options.option_base import (EuropeanOption, AmericanOption, ArithmeticDiscreteAsianOption)
+from .options.engine_types import (
+    AnalyticBsmEuropeanEngine,
+    FdBsmAmericanEngine,
+    FdBsmDiscreteArithmeticAsianEngine,
+    McBsmDiscreteArithmeticAsianEngine)
+from .options.option_types import (
+    EuropeanOption,
+    AmericanOption,
+    ArithmeticDiscreteAsianOption)
 
 PRICER_COLLECTIONS = {}
 
@@ -17,6 +24,6 @@ def register_pricer(pricer_id):
     return wrapper
 
 
-@register_pricer(12)
-def european_(op):
+@register_pricer()
+def european_pricer(op, engine):
     return op
