@@ -7,7 +7,7 @@
 python setup.py install
 ```
 
-# Reference Documents
+# Documents
 
 ## Engines and Options
 
