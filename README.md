@@ -13,8 +13,9 @@ python setup.py install
 
 Engines and options dependency relations are store in file `engine_include_config.py`.  
 
-European Option : [AnalyticBsmEuropeanEngine]  
-American Option : [FdBsmAmericanEngine]
-Arithmetic Discrete Asian Option : [FdBsmDiscreteArithmeticAsianEngine, McBsmDiscreteArithmeticAsianEngine]  
+**European Option** : [ AnalyticBsmEuropeanEngine ]  
+  
+**American Option** : [ FdBsmAmericanEngine ]  
+  
+**Arithmetic Discrete Asian Option** : [ FdBsmDiscreteArithmeticAsianEngine, McBsmDiscreteArithmeticAsianEngine ]  
 
-    
