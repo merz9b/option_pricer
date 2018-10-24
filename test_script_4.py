@@ -36,6 +36,7 @@ dividend rate : 0
 
 price : 4.77139
 """
+
 spot_price = 100
 strike_price = 100
 evaluation_date = '2018-03-07'
@@ -55,8 +56,10 @@ option.set_params(spot_price,
 if option.is_setup_finished():
     print('Setup finished')
 
-engine = AnalyticBsmEuropeanEngine(option)
-engine.set_engine()
-Ql.Settings.instance().evaluationDate = option.evaluation_date
-option.option_instance.setPricingEngine(engine.engine)
-print(option.option_instance.NPV())
+option.set_engine(AnalyticBsmEuropeanEngine)
+# option.set_engine(FdBsmAmericanEngine)
+
+if option.is_setup_finished():
+    print('Setup finished')
+
+print(option.compute())

@@ -13,6 +13,15 @@ from QuantLib import (BlackScholesMertonProcess, QuoteHandle,
                       FDAmericanEngine)
 
 
+def ensure_pairable(option_instance, engine_instance):
+    """
+    ensure option and engine pairable
+    :param option_instance: option instance
+    :param engine_instance: engine instance
+    """
+    _ = engine_instance.eid + option_instance.oid
+
+
 # engine attribution class
 
 
@@ -72,6 +81,7 @@ class PricingEngineBase(metaclass=EngineMetaType):
     def __init__(self, option):
         self.engine = None
         self.process = None
+        ensure_pairable(option, self)
         self.option = option
 
     @abstractmethod

@@ -102,6 +102,7 @@ class OptionBase(metaclass=OptionMetaType):
         self.npv = None
 
         self.option_instance = None
+        self.engine_instance = None
         self.option_type = option_type
         self.exercise = None
         self.payoff = None
@@ -115,7 +116,8 @@ class OptionBase(metaclass=OptionMetaType):
             params=False,
             exercise=False,
             payoff=False,
-            instance=False
+            instance=False,
+            engine=False
         )
 
     def set_params(
@@ -158,6 +160,10 @@ class OptionBase(metaclass=OptionMetaType):
         """
         self.payoff = PlainVanillaPayoff(self.option_type, self.strike_price)
 
+    def set_engine(self, engine_cls):
+        self.engine_instance = engine_cls(self)
+        self.__setup_finished['engine'] = True
+
     @abstractmethod
     def set_exercise(self):
         """
@@ -177,6 +183,13 @@ class OptionBase(metaclass=OptionMetaType):
         for v in self.__setup_finished.values():
             base = base and v
         return base
+
+    def compute(self):
+        assert self.is_setup_finished(), 'Option does not fully setup.'
+        Ql.Settings.instance().evaluationDate = self.evaluation_date
+        self.engine_instance.set_engine()
+        self.option_instance.setPricingEngine(self.engine_instance.engine)
+        return self.option_instance.NPV()
 
 
 class AbstractEuropeanOption(OptionBase):
