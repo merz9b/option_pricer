@@ -41,3 +41,26 @@ Engines and options dependency relations are store in file `engine_include_confi
 >  dividend rate : 0
 
 
+```python
+spot_price = 100
+strike_price = 100
+evaluation_date = '2018-03-07'
+maturity_date = '2018-07-07'
+vol = 0.2
+rf = 0.01
+
+option = EuropeanOption(Ql.Option.Put)
+
+option.set_params(spot_price,
+                  strike_price,
+                  vol,
+                  rf,
+                  evaluation_date,
+                  maturity_date)
+
+option.set_engine(AnalyticBsmEuropeanEngine)
+
+print(option.npv)
+
+print(option.greeks)
+```
