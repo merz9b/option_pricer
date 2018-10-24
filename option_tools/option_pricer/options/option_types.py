@@ -3,37 +3,32 @@
 # @Author  : Xin Zhang
 # @File    : option_types.py
 
-
 """
+params level
 
-option type coding
+1 : european or american
 
-0000 | 00000 |  0
+2 : vannilla or exotic
 
-> 0 ~ 1
+3 : asian or barrier
 
-Vannilla or Exotic
+4 : discrete or continuous
 
-
-> 2 ~ 32 dual number
-
-2 : Asian
-4 : Barrier
-6 : ....
+5 : geometric or arithmetic
 
 
 
-
+10 : engine : theoretic , mc or fd
 """
 
 from QuantLib import Option as OpType
 
 
 class OptionMetaType(type):
-    def __new__(cls, name, bases, attrs):
+    def __new__(mcs, name, bases, attrs):
         if len(bases) > 0:
             attrs['oid'] += bases[0].oid
-        return super().__new__(cls, name, bases, attrs)
+        return super().__new__(mcs, name, bases, attrs)
 
 
 # OptionType:
@@ -41,30 +36,27 @@ CALL = OpType.Call
 PUT = OpType.Put
 
 
-
 class CodeGen:
     # 1
-    VANNILLA = 0
-    EXOTIC = 1
+    EUROPEAN = 1
+    AMERICAN = 2
 
     # 2
-    EUROPEAN = 10
-    AMERICAN = 20
+    VANNILLA = 10
+    EXOTIC = 20
 
     # 3
     ASIAN = 100
     BARRIER = 200
 
     # 4
-    GEOMETRIC = 1000
-    ARITHMETIC = 2000
+    DISCRETE = 1000
+    CONTINUOUS = 2000
 
     # 5
-    DISCRETE = 10000
-    CONTINUOUS = 20000
-
-
+    GEOMETRIC = 10000
+    ARITHMETIC = 20000
 
 
 if __name__ == '__main__':
-    pass
+    print(CodeGen.AMERICAN)

@@ -3,7 +3,8 @@
 # @Author  : Xin Zhang
 # @File    : pricers.py
 
-from .options.option_types import OptionType, ExerciseType
+from .options.engine_types import EngineType
+from .options.option_base import (EuropeanOption, AmericanOption, ArithmeticDiscreteAsianOption)
 
 PRICER_COLLECTIONS = {}
 

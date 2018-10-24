@@ -4,7 +4,9 @@
 # @File    : option_base.py
 
 from option_tools.utils.tools import cast_string_to_date
-from QuantLib import SimpleQuote, China, ActualActual
+from QuantLib import (SimpleQuote, China, ActualActual,
+                      EuropeanExercise, AmericanExercise,
+                      Average, PlainVanillaPayoff)
 from .option_types import CodeGen, OptionMetaType
 
 
@@ -72,9 +74,14 @@ class Greeks:
     __repr__ = __str__
 
 
-class OptionBase(metaclass= OptionMetaType):
+class OptionBase(metaclass=OptionMetaType):
     oid = 0  # option id
-    def __init__(self):
+
+    def __init__(self, option_type):
+        """
+        initialize option with a option type[call or put]
+        :param option_type: call or put
+        """
         self.evaluation_date = None
         self.maturity_date = None
         self.spot_price = None
@@ -83,6 +90,11 @@ class OptionBase(metaclass= OptionMetaType):
         self.risk_free_rate = None
         self.dividend_rate = None
         self.npv = None
+
+        self.option_type = option_type
+        self.exercise = None
+        self.payoff = None
+
         self.greeks = Greeks()
 
         self.calendar = China()
@@ -91,7 +103,7 @@ class OptionBase(metaclass= OptionMetaType):
         self.__setup_finished = dict(
             params=False,
             exercise=False,
-            otype=False
+            payoff=False
         )
 
     def set_params(
@@ -121,22 +133,22 @@ class OptionBase(metaclass= OptionMetaType):
         self.maturity_date = cast_string_to_date(maturity_date)
         self.dividend_rate = SimpleQuote(dividend_rate)
         self.__setup_finished['params'] = True
+        self.set_exercise()
+        self.__setup_finished['exercise'] = True
+        self.set_payoff()
+        self.__setup_finished['payoff'] = True
 
-    def set_exercise(self, exercise_type):
+    def set_exercise(self):
         """
         set exercise type, european or american
-        :param exercise_type: ExerciseType
         """
-        self.oid |= exercise_type
-        self.__setup_finished['exercise'] = True
+        raise NotImplementedError
 
-    def set_type(self, option_type):
+    def set_payoff(self):
         """
-        set option type, call or put
-        :param option_type: OptionType
+        set payoff type, vannilla or others
         """
-        self.oid |= option_type
-        self.__setup_finished['otype'] = True
+        self.payoff = PlainVanillaPayoff(self.option_type, self.strike_price)
 
     def is_setup_finished(self):
         base = True
@@ -145,54 +157,102 @@ class OptionBase(metaclass= OptionMetaType):
         return base
 
 
-class VannillaOption(OptionBase):
+class AbstractEuropeanOption(OptionBase):
+    oid = CodeGen.EUROPEAN
+
+    def set_exercise(self):
+        """
+        set exercise type, european or american
+        """
+        self.exercise = EuropeanExercise(self.maturity_date)
+
+
+class AbstractAmericanOption(OptionBase):
+    oid = CodeGen.AMERICAN
+
+    def set_exercise(self):
+        """
+        set exercise type, european or american
+        """
+        self.exercise = AmericanExercise(
+            self.evaluation_date, self.maturity_date)
+
+# <<<< Vannilla European & American
+
+
+class EuropeanOption(AbstractEuropeanOption):
     oid = CodeGen.VANNILLA
 
 
-class EuropeanOption(VannillaOption):
-    oid = CodeGen.EUROPEAN
+class AmericanOption(AbstractAmericanOption):
+    oid = CodeGen.VANNILLA
+
+# <<<< Exotic European
 
 
-class AmericanOption(VannillaOption):
-    oid = CodeGen.AMERICAN
-
-
-class ExoticOption(OptionBase):
+class AbstractEuropeanExoticOption(AbstractEuropeanOption):
     oid = CodeGen.EXOTIC
 
+# <<<< Asian European
 
-class AsianOptionBase(ExoticOption):
+
+class AbstractAsianOption(AbstractEuropeanExoticOption):
     oid = CodeGen.ASIAN
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, option_type):
+        super().__init__(option_type)
+        self.__setup_finished['avg_date'] = False
+        self.__setup_finished['avg_type'] = False
         self.avg_start = None
         self.avg_end = None
+        self.avg_type = None
 
-    def set_average_params(self, avg_start, avg_end, avg_type, avg_continuity):
+    def set_averaging_date(self, avg_start, avg_end):
         """
         set asian option average params
-        :param avg_start: average start date
-        :param avg_end:  average end date
-        :param avg_type: AsianAverageType:[Geometric, Arithmetic]
-        :param avg_continuity: AveragingContinuity:[Continuous, Discrete]
+        :param avg_start: average start date, string, fmt like 2010-01-01
+        :param avg_end:  average end date, string, fmt like 2010-01-01
         """
-        self.avg_start = avg_start
-        self.avg_end = avg_end
+        self.avg_start = cast_string_to_date(avg_start)
+        self.avg_end = cast_string_to_date(avg_end)
+        self.__setup_finished['avg_date'] = True
+
+    def set_averaging_type(self):
+        """
+        set average type for asian option
+        """
+        raise NotImplementedError
 
 
-
-
-class BarrierOptionBase(ExoticOption):
+# <<<< BARRIER European
+class BarrierOption(AbstractEuropeanExoticOption):
     oid = CodeGen.BARRIER
 
 
+# <<<< Asian options
+class AbstractDiscreteAsianOption(AbstractAsianOption):
+    oid = CodeGen.DISCRETE
+
+# <<< pricing
 
 
-class AsianOption(AsianOptionBase):
-    oid = CodeGen.EUROPEAN
+class ArithmeticDiscreteAsianOption(AbstractDiscreteAsianOption):
+    oid = CodeGen.ARITHMETIC
+
+    def set_averaging_type(self):
+        self.avg_type = Average.Arithmetic
+        self.__setup_finished['avg_type'] = False
+
+    def set_averaging_date(self, avg_start, avg_end):
+        """
+        set asian option average params
+        :param avg_start: average start date, string, fmt like 2010-01-01
+        :param avg_end:  average end date, string, fmt like 2010-01-01
+        """
+        super().set_averaging_date(avg_start, avg_end)
+        self.set_averaging_type()
 
 
-class AmericanAsianOption(AsianOptionBase):
-    oid = CodeGen.AMERICAN
-
+# << Not Implemented
+class AbstractContinuousAsianOption(AbstractAsianOption):
+    oid = CodeGen.CONTINUOUS

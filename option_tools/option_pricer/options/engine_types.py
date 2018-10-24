@@ -3,25 +3,23 @@
 # @Author  : Xin Zhang
 # @File    : engine_types.py
 
-from .option_types import (OptionType, ExerciseType,
-                           AveragingContinuity, AsianAverageType)
+from .option_base import (
+    EuropeanOption,
+    AmericanOption,
+    ArithmeticDiscreteAsianOption)
 
 # MC OR ANALYTIC OR FD APPROXIMATION
 MC_INCLUDE = (
-    OptionType.CALL | ExerciseType.EUROPEAN | AsianAverageType.ARITHMETIC,
-    OptionType.PUT | ExerciseType.EUROPEAN | AsianAverageType.ARITHMETIC,
+    ArithmeticDiscreteAsianOption.oid,
 )
 
 FD_INCLUDE = (
-    OptionType.CALL | ExerciseType.AMERICAN,
-    OptionType.PUT | ExerciseType.AMERICAN,
-    OptionType.CALL | ExerciseType.EUROPEAN | AsianAverageType.ARITHMETIC | AveragingContinuity.DISCRETE,
-    OptionType.PUT | ExerciseType.EUROPEAN | AsianAverageType.ARITHMETIC | AveragingContinuity.DISCRETE,
+    AmericanOption.oid,
+    ArithmeticDiscreteAsianOption.oid
 )
 
 ANALYTIC_INCLUDE = (
-    OptionType.CALL | ExerciseType.EUROPEAN,
-    OptionType.PUT | ExerciseType.EUROPEAN,
+    EuropeanOption.oid,
 )
 
 
@@ -32,21 +30,21 @@ class Int:
         self.attr = attr
         self.value = value
 
-    def __or__(self, other):
+    def __add__(self, other):
         global MC_INCLUDE, FD_INCLUDE, ANALYTIC_INCLUDE
         if self.attr == 'analytic':
             assert other in ANALYTIC_INCLUDE, 'No analytic engine for this option.'
-            return self.value | other
+            return self.value + other
         elif self.attr == 'mc':
             assert other in MC_INCLUDE, 'No mc engine for this option.'
-            return self.value | other
+            return self.value + other
         elif self.attr == 'fd':
             assert other in FD_INCLUDE, 'No fd engine for this option.'
-            return self.value | other
+            return self.value + other
         else:
             raise TypeError('Invalid engine type.')
 
-    __ror__ = __or__
+    __radd__ = __add__
 
     def __str__(self):
         return '<{tp}> : {d}'.format(tp=self.attr.upper(), d=self.value)
@@ -55,6 +53,6 @@ class Int:
 
 
 class EngineType:
-    ANALYTIC = Int(0, 'analytic')
-    MC = Int(32, 'mc')
-    FD = Int(64, 'fd')
+    ANALYTIC = Int(1000000000, 'analytic')
+    MC = Int(2000000000, 'mc')
+    FD = Int(3000000000, 'fd')

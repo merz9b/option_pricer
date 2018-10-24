@@ -4,18 +4,19 @@
 # @File    : test_script_4.py
 
 # --------------------------------------------------------------------------
+import QuantLib as Ql
+from option_tools.utils.tools import get_signature_code
+from option_tools.option_pricer.options.option_base import EuropeanOption, AmericanOption, ArithmeticDiscreteAsianOption
+from option_tools.option_pricer.options.engine_types import EngineType
 
-from option_tools.option_pricer.options.option_base import EuropeanOption, AmericanOption, AsianOption, AmericanAsianOption, BarrierOptionBase
-
-
-print(EuropeanOption.oid)
-print(AmericanOption.oid)
-
-print(AsianOption.oid)
-print(BarrierOptionBase.oid)
-print(AmericanAsianOption.oid)
+print(EngineType.ANALYTIC + EuropeanOption.oid)
+# print(EngineType.MC + EuropeanOption.oid)
+print(EngineType.FD + AmericanOption.oid)
 
 
+print(ArithmeticDiscreteAsianOption.oid)
+print(get_signature_code(ArithmeticDiscreteAsianOption.oid, 1))
+print(get_signature_code(ArithmeticDiscreteAsianOption.oid, 5))
 
 
 """
@@ -37,7 +38,7 @@ maturity_date = '2018-07-07'
 vol = 0.2
 rf = 0.01
 
-option = EuropeanOption()
+option = EuropeanOption(Ql.Option.Call)
 
 option.set_params(spot_price,
                   strike_price,
@@ -46,7 +47,6 @@ option.set_params(spot_price,
                   evaluation_date,
                   maturity_date)
 
-option.set_type(OptionType.CALL)
 
 if option.is_setup_finished():
     pass
@@ -54,7 +54,7 @@ if option.is_setup_finished():
 
 class PricingEngine:
     def __init__(self):
-        self.engine =  0
+        self.engine = 0
 
     def set_engine(self, engine):
         self.engine = engine
