@@ -5,7 +5,7 @@
 
 
 from abc import ABCMeta, abstractmethod
-from option_tools.utils.tools import cast_string_to_date
+from option_tools.utils.tools import cast_string_to_date, GreeksComputer
 import QuantLib as Ql
 from QuantLib import (SimpleQuote,
                       EuropeanExercise, AmericanExercise,
@@ -22,51 +22,51 @@ class OptionMetaType(ABCMeta):
 
 class Greeks:
     def __init__(self):
-        self._delta = None
-        self._gamma = None
-        self._rho = None
-        self._theta = None
-        self._vega = None
+        self.__delta = None
+        self.__gamma = None
+        self.__rho = None
+        self.__theta = None
+        self.__vega = None
 
     @property
     def delta(self):
-        return self._delta
+        return self.__delta
 
     @property
     def gamma(self):
-        return self._gamma
+        return self.__gamma
 
     @property
     def rho(self):
-        return self._rho
+        return self.__rho
 
     @property
     def theta(self):
-        return self._theta
+        return self.__theta
 
     @property
     def vega(self):
-        return self._vega
+        return self.__vega
 
     @delta.setter
     def delta(self, delta):
-        self._delta = delta
+        self.__delta = delta
 
     @gamma.setter
     def gamma(self, gamma):
-        self._gamma = gamma
+        self.__gamma = gamma
 
     @rho.setter
     def rho(self, rho):
-        self._rho = rho
+        self.__rho = rho
 
     @theta.setter
     def theta(self, theta):
-        self._theta = theta
+        self.__theta = theta
 
     @vega.setter
     def vega(self, vega):
-        self._vega = vega
+        self.__vega = vega
 
     def to_dict(self):
 
@@ -77,6 +77,13 @@ class Greeks:
             'theta': self.theta,
             'vega': self.vega
         }
+
+    def all_filled(self):
+        filled = True
+        d = self.to_dict()
+        for v in d.values():
+            filled = filled and (v is not None)
+        return filled
 
     def __str__(self):
         return str(self.to_dict())
@@ -92,6 +99,11 @@ class OptionBase(metaclass=OptionMetaType):
         initialize option with a option type[call or put]
         :param option_type: call or put
         """
+        # option result
+        self.__npv = None
+        self.__greeks = Greeks()
+
+        # option attribution
         self.evaluation_date = None
         self.maturity_date = None
         self.spot_price = None
@@ -99,15 +111,12 @@ class OptionBase(metaclass=OptionMetaType):
         self.volatility = None
         self.risk_free_rate = None
         self.dividend_rate = None
-        self.npv = None
 
         self.option_instance = None
         self.engine_instance = None
         self.option_type = option_type
         self.exercise = None
         self.payoff = None
-
-        self.greeks = Greeks()
 
         self.calendar = Ql.China()
         self.day_counter = Ql.ActualActual()
@@ -190,6 +199,29 @@ class OptionBase(metaclass=OptionMetaType):
         self.engine_instance.set_engine()
         self.option_instance.setPricingEngine(self.engine_instance.engine)
         return self.option_instance.NPV()
+
+    @property
+    def greeks(self):
+        if self.__greeks.all_filled():
+            return self.__greeks
+        else:
+            gc = GreeksComputer(self.option_instance)
+            gks = gc.get_greeks(
+                self.spot_price,
+                self.risk_free_rate,
+                self.volatility,
+                self.evaluation_date)
+            self.__greeks.delta = gks['delta']
+            self.__greeks.gamma = gks['gamma']
+            self.__greeks.rho = gks['rho']
+            self.__greeks.theta = gks['theta']
+            self.__greeks.vega = gks['vega']
+            return self.__greeks
+
+    @property
+    def npv(self):
+        self.__npv = self.compute()
+        return self.__npv
 
 
 class AbstractEuropeanOption(OptionBase):

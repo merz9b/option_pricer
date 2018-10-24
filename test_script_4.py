@@ -62,4 +62,5 @@ option.set_engine(AnalyticBsmEuropeanEngine)
 if option.is_setup_finished():
     print('Setup finished')
 
-print(option.compute())
+print(option.npv)
+print(option.greeks)
