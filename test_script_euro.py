@@ -30,24 +30,26 @@ day_counter = Ql.ActualActual()
 
 payoff = Ql.PlainVanillaPayoff(Ql.Option.Call, 100)
 
-euro_option = EuropeanOption(payoff, Ql.EuropeanExercise(end_date))
+euro_option = Ql.VanillaOption(payoff, Ql.EuropeanExercise(end_date))
 
 underlying_price = SimpleQuote(100)
 interest_rate = SimpleQuote(0.01)
 volatility = SimpleQuote(0.2)
 dividend = SimpleQuote(0)
 
+
 risk_free_curve = Ql.FlatForward(
-    0,
-    Ql.TARGET(),
-    QuoteHandle(interest_rate),
+    start_date,
+    Ql.QuoteHandle(interest_rate),
     day_counter)
 volatility_curve = Ql.BlackConstantVol(
-    0, Ql.TARGET(), QuoteHandle(volatility), day_counter)
+    start_date,
+    calendar,
+    Ql.QuoteHandle(volatility),
+    day_counter)
 dividend_curve = Ql.FlatForward(
-    0,
-    Ql.TARGET(),
-    QuoteHandle(dividend),
+    start_date,
+    Ql.QuoteHandle(dividend),
     day_counter)
 
 process = Ql.BlackScholesMertonProcess(
@@ -59,7 +61,7 @@ process = Ql.BlackScholesMertonProcess(
 
 euro_option.setPricingEngine(Ql.AnalyticEuropeanEngine(process))
 
-print(euro_option.NPV()) # 4.77139
+print(euro_option.NPV())  # 4.77139
 
 # theoretical method
 gc = GreeksComputer(euro_option)

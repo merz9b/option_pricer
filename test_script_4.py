@@ -51,6 +51,38 @@ option.set_params(spot_price,
 if option.is_setup_finished():
     pass
 
+Ql.Settings.instance().evaluationDate = option.evaluation_date
+# set calendar and day counter
+calendar = Ql.China()
+day_counter = Ql.ActualActual()
+
+risk_free_curve = Ql.FlatForward(
+    option.evaluation_date,
+    Ql.QuoteHandle(option.risk_free_rate),
+    day_counter)
+
+volatility_curve = Ql.BlackConstantVol(
+    option.evaluation_date,
+    calendar,
+    Ql.QuoteHandle(option.volatility),
+    day_counter)
+
+dividend_curve = Ql.FlatForward(
+    option.evaluation_date,
+    Ql.QuoteHandle(option.dividend_rate),
+    day_counter)
+
+process = Ql.BlackScholesMertonProcess(
+    Ql.QuoteHandle(option.spot_price),
+    Ql.YieldTermStructureHandle(dividend_curve),
+    Ql.YieldTermStructureHandle(risk_free_curve),
+    Ql.BlackVolTermStructureHandle(volatility_curve)
+)
+
+option.option_instance.setPricingEngine(Ql.AnalyticEuropeanEngine(process))
+
+print(option.option_instance.NPV())  # 4.77139
+
 
 class PricingEngine:
     def __init__(self):

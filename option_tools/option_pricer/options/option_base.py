@@ -4,7 +4,8 @@
 # @File    : option_base.py
 
 from option_tools.utils.tools import cast_string_to_date
-from QuantLib import (SimpleQuote, China, ActualActual,
+import QuantLib as Ql
+from QuantLib import (SimpleQuote,
                       EuropeanExercise, AmericanExercise,
                       Average, PlainVanillaPayoff)
 from .option_types import CodeGen, OptionMetaType
@@ -91,19 +92,18 @@ class OptionBase(metaclass=OptionMetaType):
         self.dividend_rate = None
         self.npv = None
 
+        self.option_instance = None
         self.option_type = option_type
         self.exercise = None
         self.payoff = None
 
         self.greeks = Greeks()
 
-        self.calendar = China()
-        self.day_counter = ActualActual()
-
         self.__setup_finished = dict(
             params=False,
             exercise=False,
-            payoff=False
+            payoff=False,
+            instance=False
         )
 
     def set_params(
@@ -137,6 +137,14 @@ class OptionBase(metaclass=OptionMetaType):
         self.__setup_finished['exercise'] = True
         self.set_payoff()
         self.__setup_finished['payoff'] = True
+        self.set_option_instance()
+        self.__setup_finished['instance'] = True
+
+    def set_payoff(self):
+        """
+        set payoff type, vannilla or others
+        """
+        self.payoff = PlainVanillaPayoff(self.option_type, self.strike_price)
 
     def set_exercise(self):
         """
@@ -144,11 +152,11 @@ class OptionBase(metaclass=OptionMetaType):
         """
         raise NotImplementedError
 
-    def set_payoff(self):
+    def set_option_instance(self):
         """
-        set payoff type, vannilla or others
+        set option instance
         """
-        self.payoff = PlainVanillaPayoff(self.option_type, self.strike_price)
+        raise NotImplementedError
 
     def is_setup_finished(self):
         base = True
@@ -183,9 +191,15 @@ class AbstractAmericanOption(OptionBase):
 class EuropeanOption(AbstractEuropeanOption):
     oid = CodeGen.VANNILLA
 
+    def set_option_instance(self):
+        self.option_instance = Ql.VanillaOption(self.payoff, self.exercise)
+
 
 class AmericanOption(AbstractAmericanOption):
     oid = CodeGen.VANNILLA
+
+    def set_option_instance(self):
+        self.option_instance = Ql.VanillaOption(self.payoff, self.exercise)
 
 # <<<< Exotic European
 
