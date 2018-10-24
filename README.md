@@ -25,10 +25,19 @@ Engines and options dependency relations are store in file `engine_include_confi
 ## Case one : European call option
 
 >  European call option
+
 >  evaluation date : 2018-03-07
+
 >  maturity date : 2018-07-07
+
 >  spot price : 100
+
 >  strike price : 100
+
 >  volatility : 0.2
+
 >  risk_free_rate : 0.01
+
 >  dividend rate : 0
+
+
