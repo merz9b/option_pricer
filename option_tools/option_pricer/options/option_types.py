@@ -121,7 +121,7 @@ class OptionBase(metaclass=OptionMetaType):
         self.calendar = Ql.China()
         self.day_counter = Ql.ActualActual()
 
-        self.__setup_finished = dict(
+        self.setup_finished = dict(
             params=False,
             exercise=False,
             payoff=False,
@@ -155,13 +155,13 @@ class OptionBase(metaclass=OptionMetaType):
         self.evaluation_date = cast_string_to_date(evaluation_date)
         self.maturity_date = cast_string_to_date(maturity_date)
         self.dividend_rate = SimpleQuote(dividend_rate)
-        self.__setup_finished['params'] = True
+        self.setup_finished['params'] = True
         self.set_exercise()
-        self.__setup_finished['exercise'] = True
+        self.setup_finished['exercise'] = True
         self.set_payoff()
-        self.__setup_finished['payoff'] = True
+        self.setup_finished['payoff'] = True
         self.set_option_instance()
-        self.__setup_finished['instance'] = True
+        self.setup_finished['instance'] = True
 
     def set_payoff(self):
         """
@@ -171,7 +171,7 @@ class OptionBase(metaclass=OptionMetaType):
 
     def set_engine(self, engine_cls):
         self.engine_instance = engine_cls(self)
-        self.__setup_finished['engine'] = True
+        self.setup_finished['engine'] = True
 
     @abstractmethod
     def set_exercise(self):
@@ -189,7 +189,7 @@ class OptionBase(metaclass=OptionMetaType):
 
     def is_setup_finished(self):
         base = True
-        for v in self.__setup_finished.values():
+        for v in self.setup_finished.values():
             base = base and v
         return base
 
@@ -274,21 +274,24 @@ class AbstractAsianOption(AbstractEuropeanExoticOption):
 
     def __init__(self, option_type):
         super().__init__(option_type)
-        self.__setup_finished['avg_date'] = False
-        self.__setup_finished['avg_type'] = False
+        self.setup_finished['avg_date'] = False
+        self.setup_finished['avg_type'] = False
         self.avg_start = None
         self.avg_end = None
+        self.avg_freq = None
         self.avg_type = None
 
-    def set_averaging_date(self, avg_start, avg_end):
+    def set_averaging_date(self, avg_start, avg_end, freq=1):
         """
         set asian option average params
         :param avg_start: average start date, string, fmt like 2010-01-01
         :param avg_end:  average end date, string, fmt like 2010-01-01
+        :param freq: average frequency, unit: days
         """
         self.avg_start = cast_string_to_date(avg_start)
         self.avg_end = cast_string_to_date(avg_end)
-        self.__setup_finished['avg_date'] = True
+        self.avg_freq = freq
+        self.setup_finished['avg_date'] = True
 
     @abstractmethod
     def set_averaging_type(self):
@@ -313,18 +316,42 @@ class AbstractDiscreteAsianOption(AbstractAsianOption):
 class ArithmeticDiscreteAsianOption(AbstractDiscreteAsianOption):
     oid = CodeGen.ARITHMETIC
 
+    def __init__(self, option_type, past_fixes=0, cum_sum=0):
+        super().__init__(option_type)
+        self.past_fixes = past_fixes
+        self.cum_sum = cum_sum
+
     def set_averaging_type(self):
         self.avg_type = Average.Arithmetic
-        self.__setup_finished['avg_type'] = False
+        self.setup_finished['avg_type'] = True
 
-    def set_averaging_date(self, avg_start, avg_end):
+    def set_averaging_date(self, avg_start, avg_end, freq=1):
         """
         set asian option average params
         :param avg_start: average start date, string, fmt like 2010-01-01
         :param avg_end:  average end date, string, fmt like 2010-01-01
+        :param freq: average frequency, unit: days
         """
-        super().set_averaging_date(avg_start, avg_end)
+        super().set_averaging_date(avg_start, avg_end, freq)
         self.set_averaging_type()
+
+    def set_option_instance(self):
+        fixing_dates = [self.avg_end -
+                        i *
+                        7 for i in range(self.day_counter.dayCount(self.avg_start, self.avg_end) //
+                                         self.avg_freq +
+                                         1) if self.avg_end -
+                        i *
+                        7 >= self.avg_start][::-
+                                             1]
+
+        self.option_instance = Ql.DiscreteAveragingAsianOption(
+            self.avg_type,
+            self.cum_sum,
+            self.past_fixes,
+            Ql.DateVector(fixing_dates),
+            self.payoff,
+            self.exercise)
 
 
 # << Not Implemented

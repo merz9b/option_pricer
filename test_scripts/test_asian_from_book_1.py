@@ -39,8 +39,9 @@ duration_days = day_counter.dayCount(evaluation_date, maturity_date)
 #             avg_end) +
 #         1)]
 
-# fixing_dates = [avg_end - i * 7 for i in range(day_counter.dayCount(avg_start,avg_end)//7 + 1) if avg_end - i * 7 >= avg_start][::-1]
-fixing_dates = [avg_start + i * 7 for i in range(27)]
+fixing_dates = [avg_end - i * 7 for i in range(day_counter.dayCount(avg_start,avg_end)//7 + 1) if avg_end - i * 7 >= avg_start][::-1]
+
+# fixing_dates = [avg_start + i * 7 for i in range(27)]
 # set evaluation date
 calculation_date = evaluation_date
 Ql.Settings.instance().evaluationDate = calculation_date
