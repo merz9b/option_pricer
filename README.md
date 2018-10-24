@@ -94,9 +94,9 @@ print(option.greeks)
 ```python
 import QuantLib as Ql
 
-from option_tools.option_pricer.options.option_types import EuropeanOption
+from option_tools.option_pricer.options.option_types import AmericanOption
 
-from option_tools.option_pricer.options.engine_types import AnalyticBsmEuropeanEngine
+from option_tools.option_pricer.options.engine_types import FdBsmAmericanEngine
 
 spot_price = 100
 strike_price = 100

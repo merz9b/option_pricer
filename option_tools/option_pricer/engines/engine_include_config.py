@@ -3,7 +3,8 @@
 # @Author  : Xin Zhang
 # @File    : engine_include_config.py
 
-from .option_types import (
+
+from ..options.option_types import (
     EuropeanOption,
     AmericanOption,
     ArithmeticDiscreteAsianOption)
